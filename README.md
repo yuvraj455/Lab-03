@@ -7,10 +7,10 @@
         - Show the Login/Register links when user is anonymous
         - Display a logout link and the current user's email address
     - We still need to pass the User object back to the view
-- In Routes/Project.js
+- In Routes/Streaks.js
     - Modify every method that renders a view and add user object
         - Every GET handler except delete because it's a redirect
-- In Routes/Courses.js
+- In Routes/Skills.js
     - Modify every method that renders a view and add user object
         - Every GET handler
 -  Try out to verify the navbar changes accordingly
@@ -28,13 +28,13 @@
     - Have 1 view for authenticated users and 1 for anonymous users
     - Or have 1 view for both but hide/show links and buttons that perform actions such as CRUD operations
     - However, this only covers what they can see. Better authorization has to be written at the controller level.
-- In Views/Projects/Index.hbs
+- In Views/Streaks/Index.hbs
     - Use if-else statements to hide the Add button and the Actions column
-- In Views/Courses/Index.hbs
+- In Views/Skills/Index.hbs
     - Use a if-else statement to hide the Add button 
-- Navigate to /Projects/Add while anonymous
+- Navigate to /Streaks/Add while anonymous
     - This view is still visible if somebody knows or guesses the URL, which is a security flaw
-- In Routes/Project.js
+- In Routes/Streak.js
     - Create a new middleware function called IsLoggedIn()
         - Check user is authenticated by calling isAuthenticated() method in the request object
         - If User is authenticated execute next
@@ -48,7 +48,7 @@
     - Export the function
 - Now we can import this middleware in any router as needed
 - Apply the same functionality for Course
-    - Routes/Course.js
+    - Routes/Skill.js
     - Inject authentication middleware function in GET and POST handlers for '/Courses/Add'
 
 ### Part 3 Implementing GitHub authentication
@@ -95,3 +95,6 @@
     - One handles when the user clicks "Login with GitHub" on the login page
     - Second one handles when github.com sends the user back to us after an authentication attempt
 - Try it out and verify new users in the database
+
+
+
