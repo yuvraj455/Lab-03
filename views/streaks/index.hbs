@@ -1,0 +1,59 @@
+<h1>{{title}}</h1>
+{{!-- CRUD Functionality --}}
+{{!-- CREATE button --}}
+{{! Only show CRUD buttons if there's a session (authenticated user) }}
+{{#if user}}
+  <a href="/streaks/add">Add a new Streak</a>
+{{/if}}
+
+{{!-- READ Show Table to view all streaks in db --}}
+<table class="table table-striped table-hover">
+  <thead>
+    <th>Date</th>
+    <th>Goal Streak Days</th>
+    <th>Note</th>
+    <th>Skill</th>
+    <th>Progress</th>
+    <th></th>
+  </thead>
+  <tbody>
+    {{!-- Retrieve all streaks and loop --}}
+    {{#each dataset}}
+      <tr>
+        {{!-- Format the date accordingly --}}
+        <td>{{toShortDate this.date}}</td>
+        <td>{{this.goalStreakDays}}</td>
+        <td>{{this.note}}</td>
+        <td>{{this.skill}}</td>
+        
+        {{!-- Display the progress percentage --}}
+        <td>
+          {{this.progress}}%
+          <div class="progress">
+            <div
+              class="progress-bar"
+              role="progressbar"
+              style="width: {{this.progress}}%;"
+              aria-valuenow="{{this.progress}}"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
+        </td>
+        
+        {{!-- UPDATE and DELETE buttons --}}
+        <td>
+          {{! Only show CRUD buttons if there's a session (authenticated user) }}
+          {{#if ../user}}
+            <a href="/streaks/edit/{{this._id}}" class="btn btn-primary">Edit</a>
+            <a
+              href="/streaks/delete/{{this._id}}"
+              onclick="return confirmDeletion()"
+              class="btn btn-danger"
+            >Delete</a>
+          {{/if}}
+        </td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>

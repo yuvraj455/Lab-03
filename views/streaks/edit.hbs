@@ -1,0 +1,62 @@
+<link rel="stylesheet" href="/public/stylesheets/style.css" />
+
+<h1>{{title}}</h1>
+<form method="POST">
+  {{! Input names have to match the name of the fields in the mongo schema object }}
+  {{! Mapping is not automatic, but it's best practices }}
+
+  <fieldset>
+    <label for="date" class="col-2">
+      Date:
+    </label>
+    <input name="date" id="date" required type="date" value="{{toShortDate streak.date}}" />
+  </fieldset>
+
+  <fieldset>
+    <label for="goalStreakDays" class="col-2">
+      Goal Streak Days:
+    </label>
+    <input name="goalStreakDays" id="goalStreakDays" required type="number" min="1" value="{{streak.goalStreakDays}}" />
+  </fieldset>
+
+  <fieldset>
+    <label for="note" class="col-2">
+      Note:
+    </label>
+    <textarea name="note" id="note" rows="3">{{streak.note}}</textarea>
+  </fieldset>
+
+  <fieldset>
+    <label for="skill" class="col-2">
+      Skill:
+    </label>
+    <select name="skill" id="skill">
+      {{#each skills}}
+        {{createOptionElement this.name ../streak.skill}}
+      {{/each}}
+    </select>
+  </fieldset>
+  <fieldset>
+    <label for="progress" class="col-2">
+      Progress:
+    </label>
+    <input name="progress" id="progress" type="number" min="0" max="100" value="{{streak.progress}}" placeholder="Enter completion %" />
+    <div class="progress mt-2">
+      <div
+        class="progress-bar"
+        role="progressbar"
+        style="width: {{streak.progress}}%;"
+        aria-valuenow="{{streak.progress}}"
+        aria-valuemin="0"
+        aria-valuemax="100"
+      >
+        {{streak.progress}}%
+      </div>
+    </div>
+  </fieldset>
+
+  {{! Button needs to be inside <form> element to trigger POST }}
+  <button class="offset-3 btn btn-primary">
+    Save
+  </button>
+</form>

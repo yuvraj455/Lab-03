@@ -1,0 +1,28 @@
+<link rel="stylesheet" href="/stylesheets/style.css" />
+
+<h1>{{title}}</h1>
+<form method="POST">
+  <fieldset>
+    <label for="name" class="col-2">Skill Name:</label>
+    <input type="text" name="name" id="name" required />
+  </fieldset>
+
+  <fieldset>
+    <label for="category" class="col-2">Category:</label>
+    <select name="category" id="category" required>
+      <option value="">Select a category</option>
+      <option value="Arts">Arts</option>
+      <option value="Languages">Languages</option>
+      <option value="Fitness">Fitness</option>
+      <option value="Coding">Coding</option>
+      <option value="Custom">Custom</option>
+    </select>
+  </fieldset>
+
+  <fieldset>
+    <label for="description" class="col-2">Description:</label>
+    <textarea name="description" id="description" rows="3" placeholder="Describe the skill..."></textarea>
+  </fieldset>
+
+  <button type="submit" class="offset-3 btn btn-primary">Save</button>
+</form>
