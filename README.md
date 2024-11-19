@@ -1,100 +1,130 @@
-# Instructions
-
-### Part 1 Improving our Login functionality
-
-- In Layout.hbs
-    - Add if-else statement to:
-        - Show the Login/Register links when user is anonymous
-        - Display a logout link and the current user's email address
-    - We still need to pass the User object back to the view
-- In Routes/Streaks.js
-    - Modify every method that renders a view and add user object
-        - Every GET handler except delete because it's a redirect
-- In Routes/Skills.js
-    - Modify every method that renders a view and add user object
-        - Every GET handler
--  Try out to verify the navbar changes accordingly
-- In Routes/Index.js
-    - Modify every method that renders a view and add user object
-    - Add GET handler for logout
-        - Call logout() using the request object
-        - Redirect to login
-
-### Part 2 Adding Authorization to protect sections of my website
-
-- While logged out, navigate to /Project and /Courses
-    - Verify that I can still perform CRUD operations
-- There are generally two approaches for securing views
-    - Have 1 view for authenticated users and 1 for anonymous users
-    - Or have 1 view for both but hide/show links and buttons that perform actions such as CRUD operations
-    - However, this only covers what they can see. Better authorization has to be written at the controller level.
-- In Views/Streaks/Index.hbs
-    - Use if-else statements to hide the Add button and the Actions column
-- In Views/Skills/Index.hbs
-    - Use a if-else statement to hide the Add button 
-- Navigate to /Streaks/Add while anonymous
-    - This view is still visible if somebody knows or guesses the URL, which is a security flaw
-- In Routes/Streak.js
-    - Create a new middleware function called IsLoggedIn()
-        - Check user is authenticated by calling isAuthenticated() method in the request object
-        - If User is authenticated execute next
-        - Else send back to login
-    - Inject this middleware in each handler in the controller
-    - Verify that everything is locked now
-- Make this middleware function reusable
-    - Create a new folder called Extensions
-    - Add a file named authentication.js
-    - Copy over the function
-    - Export the function
-- Now we can import this middleware in any router as needed
-- Apply the same functionality for Course
-    - Routes/Skill.js
-    - Inject authentication middleware function in GET and POST handlers for '/Courses/Add'
-
-### Part 3 Implementing GitHub authentication
-
-- Open a browser and navigate to https://github.com/settings/applications/new
-    - Application name should be COMP2068 Project Tracker
-    - Homepage URL is http://localhost:3000
-    - Authorization callback URL is http://localhost:3000/auth/google/callback this URL needs to change when deploying to Render or Azure
-    - Generate the clientId and clientSecret values and copy them over to your .env file
-    - Add three new keys named as below
-        - GITHUB_CLIENT_ID
-        - GITHUB_CLIENT_SECRET
-        - GITHUB_CALLBACK_URL
-    - Add the corresponding configuration values in globals.js
-        - Create a new section called Authentication
-        - Add an inner section called GitHub
-        - Add the following keys:
-            - ClientId > use process.env to access GITHUB_CLIENT_ID
-            - ClientSecret > use process.env to access GITHUB_CLIENT_SECRET
-            - CallbackUrl > use process.env to access GITHUB_CALLBACK_URL
-- Make sure the application is not running and install the following npm package:
-    - npm i passport-github2
-    - https://www.npmjs.com/package/passport-github2
-- In Models/User.js
-    - Add oauthId: String to record the ID that's received from the login provider
-    - Add oauthProvider: String to record the provider type (GitHub, Twitter, etc)
-    - Add created: Date to record the time when the user is created in the DB
-    - Note: When creating a local user, these will be blank.
-- Add a Config folder and create a globals.js file
-    - Add a new section called github and then the following variables:
-        - clientId and clientSecret which is used by the authentication
-        - callbackUrl which is the url in our application that users will be sent back to after logging in with the external provider
-- In App.js
-    - Import the globals.js file at the top of the document
-    - Import the Strategy class in the passport-github2 package just after importing passport and session
-    - Call passport.use() to configure the github strategy and pass the required API keys and User model
-    - Add a callback function to handle two scenarios
-        - new user
-        - returning user
-- In Views/Login.hbs
-    - Add another login button with href="/github"
-- In Routes/Index.js
-    - Add a two GET handlers as specified in the documentation
-    - One handles when the user clicks "Login with GitHub" on the login page
-    - Second one handles when github.com sends the user back to us after an authentication attempt
-- Try it out and verify new users in the database
+# Skills and Streaks Tracker - Project Documentation  
 
 
+## Instructions  
 
+### Part 1: Improving Our Login Functionality  
+
+#### 1. Enhancing `Layout.hbs`  
+Modify `Layout.hbs` to include conditional statements that:  
+- Display `Login/Register` links when the user is anonymous.  
+- Show a `Logout` link and the current user's email when authenticated.  
+- Pass the `User` object back to the view in all routes that render a page.  
+
+#### 2. Modifying Routes for User Context  
+
+**In `Routes/streaks.js`:**  
+- Update each method that renders a view to include the `User` object (all `GET` handlers, except for `delete`).  
+
+**In `Routes/skills.js`:**  
+- Ensure every method rendering a view includes the `User` object.  
+
+**In `Routes/index.js`:**  
+- Pass the `User` object in all view-rendering methods.  
+- Add a `GET` handler for logout:  
+  - Call `logout()` on the request object.  
+  - Redirect the user to the login page.  
+
+#### 3. Verifying Navbar Changes  
+- Test the changes by navigating through the app to ensure that:  
+  - Navbar displays `Login/Register` when logged out.  
+  - Navbar displays the current user's email and `Logout` when logged in.  
+
+---
+
+### Part 2: Adding Authorization to Protect Sections of the Website  
+
+#### 1. Checking Authorization  
+While logged out, navigate to `/streaks` and `/skills` to verify that:  
+- All CRUD operations are still accessible (to be restricted in the next step).  
+
+#### 2. Securing Views  
+
+**Approaches for view protection:**  
+- Create separate views for authenticated and anonymous users.  
+- Use `if-else` statements to hide/show buttons for CRUD operations.  
+
+**In `Views/streaks/index.hbs`:**  
+- Use `if-else` statements to conditionally render the `Add` button and `Actions` column.  
+
+**In `Views/skills/index.hbs`:**  
+- Use `if-else` statements to hide the `Add` button when the user is not authenticated.  
+
+#### 3. Implementing Middleware for Route Protection  
+
+**In `Routes/streaks.js`:**  
+- Create a middleware function `isLoggedIn()` to check if the user is authenticated:  
+  - Use `isAuthenticated()` from the request object.  
+  - Call `next()` if authenticated; otherwise, redirect to the login page.  
+- Inject this middleware into relevant route handlers (e.g., `GET /streaks/add`).  
+- Test to confirm that unauthorized access is restricted.  
+
+**Reusability:**  
+- Create an `Extensions` folder and an `authentication.js` file.  
+- Move the `isLoggedIn()` function to `authentication.js` and export it.  
+- Import and apply this function in both `streaks.js` and `skills.js`.  
+
+#### 4. Applying Middleware for Skills  
+- Inject the `isLoggedIn()` middleware in relevant `GET` and `POST` route handlers for `/skills/add`.  
+
+---
+
+### Part 3: Implementing Google OAuth Authentication  
+
+#### 1. Setting Up Google OAuth  
+- Navigate to [Google Cloud Console](https://console.cloud.google.com/) and create a new project (or select an existing one).  
+- Go to `APIs & Services > Credentials` and click on **Create Credentials > OAuth 2.0 Client IDs**.  
+
+**Configure the OAuth consent screen:**  
+- Application name: **Skills and Streaks Tracker**.  
+- Fill out required fields and save.  
+
+**Create the OAuth 2.0 Client ID:**  
+- Authorized redirect URIs: Add `http://localhost:3000/auth/google/callback`.  
+- Copy the Client ID and Client Secret and add them to your `.env` file:  
+  ```plaintext
+  GOOGLE_CLIENT_ID=your_google_client_id  
+  GOOGLE_CLIENT_SECRET=your_google_client_secret  
+  GOOGLE_CALLBACK_URL=http://localhost:3000/auth/google/callback  
+  ```  
+
+#### 2. Updating `globals.js`  
+- Add a new `Authentication` section with a `Google` subsection:  
+  - `ClientId`: Use `process.env.GOOGLE_CLIENT_ID`.  
+  - `ClientSecret`: Use `process.env.GOOGLE_CLIENT_SECRET`.  
+  - `CallbackUrl`: Use `process.env.GOOGLE_CALLBACK_URL`.  
+
+#### 3. Installing Dependencies  
+Install the required npm package:  
+```bash  
+npm i passport-google-oauth20  
+```  
+
+#### 4. Updating the Application  
+
+**In `Models/User.js`:**  
+- Add the following fields:  
+  - `oauthId: String` – To record the ID received from the provider.  
+  - `oauthProvider: String` – To record the provider type (e.g., Google).  
+  - `created: Date` – To record the time when the user is created in the database.  
+
+**In `App.js`:**  
+- Import `globals.js` and `passport-google-oauth20`.  
+- Configure the Google strategy in `passport.use()`:  
+  - Use the API keys from your `.env` file.  
+  - Handle new and returning users in the callback function.  
+
+#### 5. Updating Views  
+
+**In `Views/Login.hbs`:**  
+- Add a login button with `href="/auth/google"`.  
+
+#### 6. Adding Routes  
+
+**In `Routes/index.js`:**  
+- Add the following handlers:  
+  - A `GET` handler to initiate the login process when the user clicks "Login with Google."  
+  - A `GET` handler to handle the callback from Google after authentication.  
+
+#### 7. Verifying Functionality  
+- Test logging in with Google and check the user database for new entries.  
